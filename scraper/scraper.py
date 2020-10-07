@@ -139,9 +139,11 @@ def extract_and_write_posts(elements, filename):
                 pass
         f.close()
     except ValueError:
-        print("Exception (extract_and_write_posts)", "Status =", sys.exc_info()[0])
+        print("Exception (extract_and_write_posts)",
+              "Status =", sys.exc_info()[0])
     except Exception:
-        print("Exception (extract_and_write_posts)", "Status =", sys.exc_info()[0])
+        print("Exception (extract_and_write_posts)",
+              "Status =", sys.exc_info()[0])
     return
 
 
@@ -156,16 +158,19 @@ def get_status_and_title(link, x):
         if status == "":
             temp = utils.get_div_links(x, "img", selectors)
             if temp == "":  # no image tag which means . it is not a life event
-                link = utils.get_div_links(x, "a", selectors).get_attribute("href")
+                link = utils.get_div_links(
+                    x, "a", selectors).get_attribute("href")
                 post_type = "status update without text"
             else:
                 post_type = "life event"
-                link = utils.get_div_links(x, "a", selectors).get_attribute("href")
+                link = utils.get_div_links(
+                    x, "a", selectors).get_attribute("href")
                 status = utils.get_div_links(x, "a", selectors).text
         else:
             post_type = "status update"
             if utils.get_div_links(x, "a", selectors) != "":
-                link = utils.get_div_links(x, "a", selectors).get_attribute("href")
+                link = utils.get_div_links(
+                    x, "a", selectors).get_attribute("href")
 
     elif title.text.find(" shared ") != -1:
         x1, link = utils.get_title_links(title)
@@ -209,19 +214,23 @@ def extract_and_write_group_posts(elements, filename):
         for post_id in ids:
             i += 1
             try:
-                add_group_post_to_file(f, filename, post_id, i, total, reload=True)
+                add_group_post_to_file(
+                    f, filename, post_id, i, total, reload=True)
             except ValueError:
                 pass
         f.close()
     except ValueError:
-        print("Exception (extract_and_write_posts)", "Status =", sys.exc_info()[0])
+        print("Exception (extract_and_write_posts)",
+              "Status =", sys.exc_info()[0])
     except Exception:
-        print("Exception (extract_and_write_posts)", "Status =", sys.exc_info()[0])
+        print("Exception (extract_and_write_posts)",
+              "Status =", sys.exc_info()[0])
     return
 
 
 def add_group_post_to_file(f, filename, post_id, number=1, total=1, reload=False):
-    print("Scraping Post(" + post_id + "). " + str(number) + " of " + str(total))
+    print("Scraping Post(" + post_id + "). " +
+          str(number) + " of " + str(total))
     photos_dir = os.path.dirname(filename)
     if reload:
         driver.get(utils.create_post_link(post_id, selectors))
@@ -286,7 +295,8 @@ def save_to_file(name, elements, status, current_section):
                 if download_friends_photos:
                     if friends_small_size:
                         img_links = [
-                            x.find_element_by_css_selector("img").get_attribute("src")
+                            x.find_element_by_css_selector(
+                                "img").get_attribute("src")
                             for x in elements
                         ]
                     else:
@@ -444,7 +454,8 @@ def save_to_file(name, elements, status, current_section):
         f.close()
 
     except Exception:
-        print("Exception (save_to_file)", "Status =", str(status), sys.exc_info()[0])
+        print("Exception (save_to_file)", "Status =",
+              str(status), sys.exc_info()[0])
 
     return
 
@@ -564,7 +575,8 @@ def scrap_profile():
         file_names = params[item]["file_names"]
         save_status = params[item]["save_status"]
 
-        scrape_data(user_id, scan_list, section, elements_path, save_status, file_names)
+        scrape_data(user_id, scan_list, section,
+                    elements_path, save_status, file_names)
 
         print("{} Done!".format(item))
 
@@ -597,8 +609,10 @@ def get_comments():
         data = data.find_elements_by_xpath(selectors.get("comment"))
         for d in data:
             try:
-                author = d.find_element_by_xpath(selectors.get("comment_author")).text
-                text = d.find_element_by_xpath(selectors.get("comment_text")).text
+                author = d.find_element_by_xpath(
+                    selectors.get("comment_author")).text
+                text = d.find_element_by_xpath(
+                    selectors.get("comment_text")).text
                 replies = utils.get_replies(d, selectors)
                 comments.append([author, text, replies])
             except Exception:
@@ -618,8 +632,10 @@ def get_group_post_as_line(post_id, photos_dir):
         if link != "":
             link = link.get_attribute("href")
         post_type = ""
-        status = '"' + utils.get_status(data, selectors).replace("\r\n", " ") + '"'
-        photos = utils.get_post_photos_links(data, selectors, photos_small_size)
+        status = '"' + \
+            utils.get_status(data, selectors).replace("\r\n", " ") + '"'
+        photos = utils.get_post_photos_links(
+            data, selectors, photos_small_size)
         comments = get_comments()
         photos = image_downloader(photos, photos_dir)
         line = (
@@ -707,7 +723,8 @@ def scrape_group(url):
         file_names = params[item]["file_names"]
         save_status = params[item]["save_status"]
 
-        scrape_data(url, scan_list, section, elements_path, save_status, file_names)
+        scrape_data(url, scan_list, section,
+                    elements_path, save_status, file_names)
 
         print("{} Done!".format(item))
 
@@ -743,6 +760,9 @@ def login(email, password):
             print("Error loading chrome webdriver " + sys.exc_info()[0])
             exit(1)
 
+        driver.execute_cdp_cmd('Network.setUserAgentOverride', {
+                               "userAgent": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)", "platform": "Windows"})
+
         fb_path = facebook_https_prefix + facebook_link_body
         driver.get(fb_path)
         driver.maximize_window()
@@ -759,7 +779,8 @@ def login(email, password):
             driver.find_element_by_name("login").click()
 
         # if your account uses multi factor authentication
-        mfa_code_input = utils.safe_find_element_by_id(driver, "approvals_code")
+        mfa_code_input = utils.safe_find_element_by_id(
+            driver, "approvals_code")
 
         if mfa_code_input is None:
             return
@@ -769,9 +790,11 @@ def login(email, password):
 
         # there are so many screens asking you to verify things. Just skip them all
         while (
-            utils.safe_find_element_by_id(driver, "checkpointSubmitButton") is not None
+            utils.safe_find_element_by_id(
+                driver, "checkpointSubmitButton") is not None
         ):
-            dont_save_browser_radio = utils.safe_find_element_by_id(driver, "u_0_3")
+            dont_save_browser_radio = utils.safe_find_element_by_id(
+                driver, "u_0_3")
             if dont_save_browser_radio is not None:
                 dont_save_browser_radio.click()
 
@@ -804,6 +827,7 @@ def scraper(**kwargs):
         print("\nStarting Scraping...")
         login(cfg["email"], cfg["password"])
         for url in urls:
+            print('here is your url', url)
             driver.get(url)
             link_type = utils.identify_url(driver.current_url)
             if link_type == 0:
